@@ -2,7 +2,7 @@
 A Simple Canvas Painting developed with JavaScript
 
 # Demo
-www.yusufsezer.com/projects/javascript-canvas-painting/
+www.yusufsezer.com/javascript-canvas-painting/
 
 # License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details
