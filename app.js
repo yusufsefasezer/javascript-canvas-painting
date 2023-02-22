@@ -1,72 +1,86 @@
-"use strict";
-var canvasArea = null,
-    btnClear = null,
-    btnSave = null,
-    inputColor = null,
-    inputSize = null,
-    ctx = null,
+'use strict';
+
+var buttonClear = {},
+    buttonSave = {},
+    inputColor = {},
+    inputSize = {},
+    canvasArea = {},
     canvasWidth = 900,
     canvasHeight = 500,
+    canvasContext = {},
     isDrawing = false,
     lineWidth = 3;
 
-function initialize() {
-    canvasArea = document.querySelector("#canvas-area");
+function initElem() {
+    buttonClear = document.getElementById('clear');
+    buttonSave = document.getElementById('save');
+    inputColor = document.getElementById('color');
+    inputSize = document.getElementById('size');
+    canvasArea = document.getElementById('canvas-area');
     canvasArea.width = canvasWidth;
     canvasArea.height = canvasHeight;
+    canvasContext = canvasArea.getContext('2d');
+}
 
-    ctx = canvasArea.getContext("2d");
+function onMouseUp() {
+    isDrawing = false;
+    canvasContext.beginPath();
+}
 
-    btnClear = document.querySelector("#clear");
-    btnSave = document.querySelector("#save");
-    inputColor = document.querySelector("#color");
-    inputSize = document.querySelector("#size");
+function onCanvasMouseDown() {
+    isDrawing = true;
+}
 
-    window.onmouseup = function () {
-        isDrawing = false;
-        ctx.beginPath();
-    }
-
-    canvasArea.onmousedown = function (e) {
-        isDrawing = true;
-    }
-
-    canvasArea.onmousemove = function (e) {
-        if (isDrawing) {
-            ctx.lineTo(e.offsetX, e.offsetY);
-            ctx.lineWidth = lineWidth * 2;
-            ctx.lineCap = "round";
-            ctx.lineJoin = "round";
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.arc(e.offsetX, e.offsetY, lineWidth, 0, 2 * Math.PI, true);
-            ctx.fill();
-            ctx.beginPath();
-            ctx.moveTo(e.offsetX, e.offsetY);
-        }
-    }
-
-    btnClear.onclick = function () {
-        ctx.clearRect(0, 0, canvasArea.width, canvasArea.height);
-    }
-
-    btnSave.onclick = function () {
-        canvasArea.toBlob(function (blob) {
-            var link = document.createElement("a");
-            link.download = "draw.png";
-            link.href = URL.createObjectURL(blob);
-            link.dispatchEvent(new MouseEvent('click'));
-        }, 'image/png', 1);
-    }
-
-    inputColor.onchange = function () {
-        ctx.fillStyle = this.value;
-        ctx.strokeStyle = this.value;
-    }
-
-    inputSize.onchange = function () {
-        lineWidth = this.value;
+function onCanvasMouseMove(event) {
+    if (isDrawing) {
+        canvasContext.lineTo(event.offsetX, event.offsetY);
+        canvasContext.lineWidth = lineWidth * 2;
+        canvasContext.lineCap = 'round';
+        canvasContext.lineJoin = 'round';
+        canvasContext.stroke();
+        canvasContext.beginPath();
+        canvasContext.arc(event.offsetX, event.offsetY, lineWidth, 0, 2 * Math.PI, true);
+        canvasContext.fill();
+        canvasContext.beginPath();
+        canvasContext.moveTo(event.offsetX, event.offsetY);
     }
 }
 
-window.onload = initialize;
+function onClearClick() {
+    canvasContext.clearRect(0, 0, canvasArea.width, canvasArea.height);
+}
+
+function onSaveClick() {
+    canvasArea.toBlob(function (blob) {
+        var link = document.createElement('a');
+        link.download = 'draw.png';
+        link.href = URL.createObjectURL(blob);
+        link.dispatchEvent(new MouseEvent('click'));
+    }, 'image/png', 1);
+}
+
+function onColorChange() {
+    canvasContext.fillStyle = this.value;
+    canvasContext.strokeStyle = this.value;
+}
+
+function onSizeChange() {
+    lineWidth = this.value;
+}
+
+function initEvent() {
+    window.addEventListener('mouseup', onMouseUp);
+    canvasArea.addEventListener('mousedown', onCanvasMouseDown);
+    canvasArea.addEventListener('mousemove', onCanvasMouseMove)
+    buttonClear.addEventListener('click', onClearClick);
+    buttonSave.addEventListener('click', onSaveClick);
+    inputColor.addEventListener('change', onColorChange);
+    inputSize.addEventListener('change', onSizeChange);
+}
+
+function init() {
+    initElem();
+    initEvent();
+}
+
+window.addEventListener('DOMContentLoaded', init);
